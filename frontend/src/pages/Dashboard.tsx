@@ -19,21 +19,25 @@ export default function Dashboard() {
       .finally(() => setLoading(false))
   }, [])
 
-  const csAvg =
-    data && data.cs_subjects_progress.length > 0
-      ? data.cs_subjects_progress.reduce((s, x) => s + x.progress_percent, 0) /
-        data.cs_subjects_progress.length
-      : 0
-
   if (loading) return <div className="text-slate-500">Loading dashboard...</div>
   if (error) return <div className="text-red-600">{error}</div>
   if (!data) return null
 
+  const readiness = Math.round(data.readiness_score)
+  const dsaPercent = Math.min(100, Math.round(data.dsa_progress_percent))
+
   const stats = [
-    { label: 'DSA Progress', value: `${data.dsa_progress_percent}%`, color: 'text-primary' },
-    { label: 'CS Subjects', value: `${csAvg.toFixed(0)}%`, color: 'text-accent' },
-    { label: 'Resume Score', value: data.resume_score != null ? `${data.resume_score}%` : 'N/A', color: 'text-emerald-600' },
-    { label: 'Mock Interview', value: data.mock_interview_score != null ? `${data.mock_interview_score}` : 'N/A', color: 'text-amber-600' },
+    { label: 'DSA Progress', value: `${dsaPercent}%`, color: 'text-primary' },
+    {
+      label: 'Resume Score',
+      value: data.resume_score != null ? `${Math.round(data.resume_score)}%` : 'N/A',
+      color: 'text-emerald-600',
+    },
+    {
+      label: 'Mock Interview',
+      value: `${Math.round(data.mock_interview_score ?? 0)}%`,
+      color: 'text-amber-600',
+    },
   ]
 
   return (
@@ -47,9 +51,9 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-white/70">Placement Readiness</p>
-            <p className="text-4xl font-bold">{data.readiness_score}%</p>
+            <p className="text-4xl font-bold">{readiness}%</p>
             <p className="mt-1 text-sm text-white/80">
-              {data.readiness_score >= 70
+              {readiness >= 70
                 ? "You're on track — keep going!"
                 : 'Focus on weak areas to improve.'}
             </p>
@@ -61,7 +65,7 @@ export default function Dashboard() {
         </div>
       </Card>
 
-      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         {stats.map((s) => (
           <Card key={s.label}>
             <p className="text-sm text-slate-500">{s.label}</p>
@@ -69,27 +73,6 @@ export default function Dashboard() {
           </Card>
         ))}
       </div>
-
-      <h2 className="mb-4 text-lg font-semibold">Upcoming Companies</h2>
-      {data.upcoming_companies.length === 0 ? (
-        <Card>
-          <p className="text-slate-500">Set target companies in your profile to see them here.</p>
-        </Card>
-      ) : (
-        <div className="grid gap-3 md:grid-cols-2">
-          {data.upcoming_companies.map((c) => (
-            <Card key={c.id} className="flex items-start justify-between">
-              <div>
-                <p className="font-semibold">{c.name}</p>
-                <p className="mt-1 text-sm text-slate-500 line-clamp-2">{c.description}</p>
-              </div>
-              <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
-                {c.difficulty_level}
-              </span>
-            </Card>
-          ))}
-        </div>
-      )}
     </div>
   )
 }

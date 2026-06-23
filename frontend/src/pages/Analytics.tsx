@@ -40,15 +40,18 @@ export default function Analytics() {
       <PageHeader title="Placement Analytics" subtitle="Track readiness and identify gaps" />
 
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Readiness" value={`${data.readiness_score}%`} />
-        <StatCard label="DSA Completion" value={`${data.dsa_completion_percent}%`} />
+        <StatCard label="Readiness" value={`${Math.round(data.readiness_score)}%`} />
         <StatCard
-          label="Resume Score"
-          value={data.resume_score != null ? `${data.resume_score}%` : 'N/A'}
+          label="DSA Completion"
+          value={`${Math.min(100, Math.round(data.dsa_completion_percent))}%`}
         />
         <StatCard
-          label="Mock Interview Avg"
-          value={data.mock_interview_avg != null ? data.mock_interview_avg.toFixed(1) : 'N/A'}
+          label="Resume Score"
+          value={data.resume_score != null ? `${Math.round(data.resume_score)}%` : 'N/A'}
+        />
+        <StatCard
+          label="Mock Interview"
+          value={`${Math.round(data.mock_interview_avg ?? 0)}%`}
         />
       </div>
 
